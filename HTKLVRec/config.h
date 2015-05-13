@@ -43,8 +43,8 @@ typedef unsigned int PronId;
 #endif
 
 /* types for kenlm */
-//typedef lm::ngram::QuantTrieModel ModelT;
-typedef lm::ngram::TrieModel ModelT;
+typedef lm::ngram::QuantTrieModel ModelT;
+//typedef lm::ngram::TrieModel ModelT;
 typedef ModelT::Vocabulary VocabularyT;
 typedef ModelT::State StateT;
 
