@@ -34,7 +34,7 @@ includedir = ${prefix}/include
 oldincludedir = /usr/include
 
 CC      = 	g++
-CFLAGS  := 	-DNDEBUG -DKENLM_MAX_ORDER=6 -D__cplusplus -DNO_LAT_LM -lrt -m32 -ansi -D_SVID_SOURCE -DOSS_AUDIO -D'ARCH="x86_64"' -Wall -Wno-switch -g -O2  -I./kenlm -I$(inc)
+CFLAGS  := 	-DNDEBUG -DKENLM_MAX_ORDER=6 -D__cplusplus -DNO_LAT_LM -lrt -m32 -ansi -D_SVID_SOURCE -DOSS_AUDIO -D'ARCH="x86_64"' -w -Wno-switch -g -O2  -I./kenlm -I$(inc)
 LDFLAGS = 	-L/usr/X11R6/lib  -lm
 INSTALL = 	/usr/bin/install -c
 HTKLIB = $(inc)/HTKLiblv.a

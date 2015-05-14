@@ -1082,7 +1082,7 @@ static void InitLMlaTree(LexNet *net, TLexNet *tnet)
      convert the large, verbose temp lex structure into the compact LexNet structure
      nodes are ordered in layers
  */
-LexNet *ConvertTLex2Lex (MemHeap *heap, const VocabularyT *vocab_kenlm, TLexNet *tnet)
+LexNet *ConvertTLex2Lex (MemHeap *heap, ModelT *lm_kenlm, TLexNet *tnet)
 {
    int i, nn, nl, nlTotal = 0;
    LexNet *net;
@@ -1140,8 +1140,14 @@ LexNet *ConvertTLex2Lex (MemHeap *heap, const VocabularyT *vocab_kenlm, TLexNet 
    net->pronlist = (Pron *) New (heap, (net->voc->nprons + 1) * sizeof (Pron));
    net->pronlist[0] = NULL;
 
-   net->pron2wordIndex = (unsigned int *) New (heap, (net->voc->nprons + 1) * sizeof (unsigned int));
+   net->pron2wordIndex = (PronId *) New (heap, (net->voc->nprons + 1) * sizeof (PronId));
    net->pron2wordIndex[0] = -1;
+
+   lm_kenlm->m_unigrams = (LogFloat*) New( heap, (net->voc->nprons + 1) * sizeof(LogFloat) );
+   lm_kenlm->m_unigrams[0] = -100;
+
+   lm_kenlm->m_pron2wordIndex = (PronId *) New (heap, (net->voc->nprons + 1) * sizeof (PronId));
+   lm_kenlm->m_pron2wordIndex[0] = -1;
 
    /* initialise pointers to start of layers */
    ln = net->node;
@@ -1170,6 +1176,9 @@ LexNet *ConvertTLex2Lex (MemHeap *heap, const VocabularyT *vocab_kenlm, TLexNet 
    InitLMlaTree(net, tnet);
 
 
+   const VocabularyT *vocab_kenlm = lm_kenlm->GetVocabulary_ptr();
+   StateT state(lm_kenlm->NullContextState()), out_state;
+
    /* the real conversion follows here: */
    net->start = tnet->start->ln;
    net->end = tnet->end->ln;
@@ -1190,7 +1199,10 @@ LexNet *ConvertTLex2Lex (MemHeap *heap, const VocabularyT *vocab_kenlm, TLexNet 
          assert (tln->loWE == tln->hiWE);
          ln->data.pron = tln->loWE;
          net->pronlist[tln->loWE] = tln->pron;
-	 net->pron2wordIndex[tln->loWE] = vocab_kenlm->Index(tln->pron->word->wordName->name);
+	 net->pron2wordIndex[tln->loWE]         =  vocab_kenlm->Index(tln->pron->word->wordName->name);
+	 lm_kenlm->m_pron2wordIndex[tln->loWE]  =  net->pron2wordIndex[tln->loWE];
+	 lm_kenlm->m_unigrams[tln->loWE]        =  IN10*lm_kenlm->Score(state, net->pron2wordIndex[tln->loWE], out_state);
+	 //printf("%s %f\n",tln->pron->word->wordName->name,lm_kenlm->m_unigrams[tln->loWE]);
          break;
       default:
          HError (9999, "HLVNet: unknown node type %d\n", tln->type);
@@ -1399,7 +1411,7 @@ void WriteTLex (TLexNet *net, char *fn)
 
 /* Create the Lexicon Network based on the vocabulary and model set
 */
-LexNet *CreateLexNet (MemHeap *heap, const VocabularyT *vocab_kenlm, Vocab *voc, HMMSet *hset, 
+LexNet *CreateLexNet (MemHeap *heap, ModelT *lm_kenlm, Vocab *voc, HMMSet *hset, 
                       char *startWord, char *endWord, Boolean silDict)
 {
    int i;
@@ -1524,7 +1536,7 @@ LexNet *CreateLexNet (MemHeap *heap, const VocabularyT *vocab_kenlm, Vocab *voc,
    AssignWEIds(tnet);
 
    /* convert TLexNet to more compact LexNet */
-   net = ConvertTLex2Lex(heap, vocab_kenlm,tnet);
+   net = ConvertTLex2Lex(heap, lm_kenlm,tnet);
 
    /* all tokens pass through SA directly before (i.e. with no time diff) the first 
       model of a new word. Update time and score in last weHyp of token in this layer */

@@ -53,6 +53,11 @@ char *hlvlm_vc_id = "$Id: HLVLM.c,v 1.1.1.1 2006/10/11 09:54:55 jal58 Exp $";
 
 #include <assert.h>
 
+
+
+/* ---------------------------- lmla using kenlm --------------------- */
+static LOOKAHEADTYPE lookahead_kenlm;
+
 /* ----------------------------- Trace Flags ------------------------- */
 
 #define T_TOP 0001         /* Trace  */
@@ -79,6 +84,13 @@ LogFloat LMLookAhead_ngram (FSLM *lm, LMState src, PronId minPron, PronId maxPro
 LogFloat LMTransProb_latlm (FSLM *lm, LMState src, PronId pronid, LMState *dest);
 LogFloat LMLookAhead_latlm (FSLM *lm, LMState src, PronId minPron, PronId maxPron);
 LMState Fast_LMLA_LMState (FSLM *lm, LMState src);
+
+
+//kenlm
+
+LogFloat LMLookAhead_ngram_kenlm (ModelT* lm_kenlm, StateT& src, PronId minPron, PronId maxPron);
+LogFloat LMLookAhead_2gram_kenlm (ModelT* lm_kenlm, StateT& src, PronId minPron, PronId maxPron);
+LogFloat LMLookAhead_3gram_kenlm (ModelT* lm_kenlm, StateT& src, PronId minPron, PronId maxPron);
      
 /* --------------------------- Initialisation ---------------------- */
 
@@ -557,6 +569,43 @@ void SetStartEnd (FSLM *lm, char *startWord, char *endWord, Vocab *vocab)
    lm->endPronId = (LMId) (int) word->pron->aux;
 }
 
+/* CreateKenLMLA
+ * create kenlmla depend on lm_kenlm`s order
+ */
+void CreateKenLMLA(ModelT *lm_kenlm)
+{
+	lookahead_kenlm = LMLookAhead_ngram_kenlm;
+	switch( lm_kenlm->Order() ){
+		case 2:
+			lookahead_kenlm = LMLookAhead_2gram_kenlm;
+			break;
+		case 3:
+			lookahead_kenlm = LMLookAhead_3gram_kenlm;
+			break;
+	}
+}
+
+LogFloat LMLookAhead_ngram_kenlm (ModelT* lm_kenlm, StateT& src, PronId minPron, PronId maxPron)
+{
+	printf("To be done\n");
+	return 0.0;
+}
+
+LogFloat LMLookAhead_2gram_kenlm (ModelT* lm_kenlm, StateT& src, PronId minPron, PronId maxPron)
+{
+	printf("To be done\n");
+	return 0.0;
+}
+
+LogFloat LMLookAhead_3gram_kenlm (ModelT* lm_kenlm, StateT& src, PronId minPron, PronId maxPron)
+{
+	printf("To be done\n");
+	return 0.0;
+}
+
+
+
+
 /* CreateLM
 
      Read ARPA-style language model from File and return LM structure
@@ -997,21 +1046,24 @@ static SEntry *FindMinSEntryP (SEntry *low, SEntry *hi, PronId minPron)
 //}
 
 
-LogFloat LMLookAhead_kenlm (ModelT* lm_kenlm, const VocabularyT *vocab_kenlm, Vocab& vocab_htk, StateT &src, std::vector<char*>& pWords)
+LogFloat LMLookAhead_kenlm (ModelT* lm_kenlm, StateT &src, PronId minPron, PronId maxPron)
 {
-	LogFloat maxProb = LZERO;
-	LogFloat prob;
-	StateT dest;
 
-	int i;
-	for( i=0; i<pWords.size(); i++ ){
-		prob = lm_kenlm->Score( src, vocab_kenlm->Index(pWords[i]), dest );
-		if( prob > maxProb )
-			maxProb = prob;
-	}
+   return lookahead_kenlm (lm_kenlm, src, minPron, maxPron);
 
-	maxProb = -maxProb*IN10;
-	return maxProb;
+//	LogFloat maxProb = LZERO;
+//	LogFloat prob;
+//	StateT dest;
+//
+//	int i;
+//	for( i=0; i<pWords.size(); i++ ){
+//		prob = lm_kenlm->Score( src, vocab_kenlm->Index(pWords[i]), dest );
+//		if( prob > maxProb )
+//			maxProb = prob;
+//	}
+//
+//	maxProb = -maxProb*IN10;
+//	return maxProb;
 }
 
 /* LMLookAhead

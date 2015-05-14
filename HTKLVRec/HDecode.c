@@ -51,6 +51,7 @@ char *hdecode_sccs_id = "$Id: HDecode.c,v 1.1.1.1 2006/10/11 09:54:55 jal58 Exp 
 #include "HNet.h"       /* for Lattice */
 #include "HLat.h"       /* for Lattice */
 
+
 #include "config.h"
 
 #include "HLVNet.h"
@@ -662,8 +663,11 @@ DecoderInst *Initialise (void)
       //lm_htk = CreateLM (&lmHeap, langfn, startWord, endWord, &vocab);
       lm_kenlm = new ModelT(langfn);
 
+      //create lookahead_kenlm depend on lm`s order
+      CreateKenLMLA(lm_kenlm);
+
       /* create network */
-      net = CreateLexNet (&netHeap, lm_kenlm->GetVocabulary_ptr(), &vocab, &hset, startWord, endWord, silDict);
+      net = CreateLexNet (&netHeap, lm_kenlm, &vocab, &hset, startWord, endWord, silDict);
 //      using namespace lm::ngram;
 //      ModelType model_type;
 //      if (RecognizeBinary(langfn, model_type)) {
@@ -1023,7 +1027,7 @@ void DoRecognition (DecoderInst *dec, char *fn)
       /* create network of all the words/prons marked (word->aux and pron->aux == 1) */
       if (trace & T_TOP)
          printf ("Creating network\n");
-      net = CreateLexNet (&netHeap, lm_kenlm->GetVocabulary_ptr(), &vocab, &hset, startWord, endWord, silDict);
+      net = CreateLexNet (&netHeap, lm_kenlm, &vocab, &hset, startWord, endWord, silDict);
 
       /* create LM based on pronIds defined by CreateLexNet */
       if (trace & T_TOP)

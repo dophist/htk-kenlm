@@ -31,6 +31,7 @@ namespace detail {
 template <class Search, class VocabularyT> class GenericModel : public base::ModelFacade<GenericModel<Search, VocabularyT>, State, VocabularyT> {
   private:
     typedef base::ModelFacade<GenericModel<Search, VocabularyT>, State, VocabularyT> P;
+    typedef unsigned int PronId;
   public:
     // This is the model type returned by RecognizeBinary.
     static const ModelType kModelType;
@@ -102,6 +103,11 @@ template <class Search, class VocabularyT> class GenericModel : public base::Mod
       // Compiler should optimize this if away.  
       return Search::kDifferentRest ? InternalUnRest(pointers_begin, pointers_end, first_length) : 0.0;
     }
+
+    // add by yjsi
+  public:
+    float  *m_unigrams;
+    PronId *m_pron2wordIndex;
 
   private:
     FullScoreReturn ScoreExceptBackoff(const WordIndex *const context_rbegin, const WordIndex *const context_rend, const WordIndex new_word, State &out_state) const;

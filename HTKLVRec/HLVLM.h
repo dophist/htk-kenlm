@@ -46,6 +46,8 @@ typedef Ptr LMState;
 
 typedef struct _FSLM FSLM;
 
+typedef LogFloat (*LOOKAHEADTYPE) (ModelT* lm_kenlm, StateT& src, PronId minPron, PronId maxPron);
+
 /* the following definitions should probably be private */
 
 typedef struct _FSLM_ngram FSLM_ngram;
@@ -177,6 +179,8 @@ void InitLVLM (void);
 FSLM *CreateLMfromLat (MemHeap *heap, char *latfn, Lattice *lat, Vocab *vocab);
 FSLM *CreateLM (MemHeap *heap, char *fn, char *startWord, char *endWord, Vocab *vocab);
 
+void CreateKenLMLA(ModelT *lm_kenlm);
+
 LogFloat LMTransProb (FSLM *lm, LMState src, PronId word, LMState *dest); 
 
 LogFloat LMTransProb_kenlm(ModelT* lm_kenlm, /*const VocabularyT *vocab_kenlm,*/ StateT &src, /*char* pWord*/ unsigned int word_index, StateT &dest);
@@ -186,7 +190,8 @@ StateT LMInitial_kenlm(ModelT *lm_kenlm);
 
 LogFloat LMLookAhead (FSLM *lm, LMState src, PronId minPron, PronId maxPron);
 //LogFloat LMLookAhead_kenlm (ModelT* lm_kenlm, const VocabularyT *vocab_kenlm, Vocab& vocab_htk, StateT &src, PronId minPron, PronId maxPron);
-LogFloat LMLookAhead_kenlm (ModelT* lm_kenlm, const VocabularyT *vocab_kenlm, Vocab& vocab_htk, StateT &src, std::vector<char*>& pWords);
+//LogFloat LMLookAhead_kenlm (ModelT* lm_kenlm, const VocabularyT *vocab_kenlm, Vocab& vocab_htk, StateT &src, std::vector<char*>& pWords);
+LogFloat LMLookAhead_kenlm (ModelT* lm_kenlm, StateT &src, PronId minPron, PronId maxPron);
 LMState Fast_LMLA_LMState (FSLM *lm, LMState src);
 lm::ngram::State Fast_LMLA_LMState_kenlm(ModelT *lm_kenlm, StateT src);
 

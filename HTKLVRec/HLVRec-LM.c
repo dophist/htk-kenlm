@@ -366,14 +366,14 @@ static LMTokScore LMCacheLookaheadProb_kenlm (DecoderInst *dec, StateT &lmState,
          laNode = &laTree->node[lmlaIdx];
          ++cache->laMiss;
          //lmscore = dec->lmScale * LMLookAhead_kenlm (dec->lm_kenlm, lmState, laNode->loWE, laNode->hiWE);
-	 std::vector<char*> pWords;
-	 int i=laNode->loWE;
-	 for( ; i<=laNode->hiWE; i++){
-		 pWords.push_back(dec->net->pronlist[i]->word->wordName->name);
-	 }
+	 //std::vector<char*> pWords;
+	 //int i=laNode->loWE;
+	 //for( ; i<=laNode->hiWE; i++){
+	 //        pWords.push_back(dec->net->pronlist[i]->word->wordName->name);
+	 //}
 
          //lmscore = dec->lmScale * LMLookAhead_kenlm (dec->lm_kenlm, dec->vocab_kenlm, dec->vocab_htk, lmState, laNode->loWE, laNode->hiWE);
-         lmscore = dec->lmScale * LMLookAhead_kenlm (dec->lm_kenlm, dec->vocab_kenlm, dec->vocab_htk, lmState, pWords);
+         lmscore = dec->lmScale * LMLookAhead_kenlm (dec->lm_kenlm,  lmState, laNode->loWE, laNode->hiWE);
       }
       else {         /* complex node */
          CompLMlaNode *laNode;

@@ -120,9 +120,8 @@ typedef struct _LexNet {
 
    Pron *pronlist;              /* array [1..voc->nprons]  of Prons for given PronId */
 
-   unsigned int* pron2wordIndex; /* array[1..voc->nprons] of kenlm word_index given PronId*/
-
-   LMlaTree *laTree;            /* look ahead tree */
+   unsigned int* pron2wordIndex; /* array[1..voc->nprons] of kenlm wvocab_kenlmLM */
+   LMlaTree *laTree;              /* look ahead tree */
 } LexNet;
 
 
@@ -284,7 +283,7 @@ void InitLVNet(void);
 
 /* build lexicon network for recognition for Vocab and HMMSet */
 
-LexNet *CreateLexNet (MemHeap *heap, const VocabularyT *vocab_kenlm, Vocab *voc, HMMSet *hset, 
+LexNet *CreateLexNet (MemHeap *heap, ModelT *lm_kenlm, Vocab *voc, HMMSet *hset, 
                       char *startWord, char *endWord, Boolean silDict);
 
 
