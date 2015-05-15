@@ -82,6 +82,7 @@ struct _LexNode {
    LexNode **foll;		/* array of following nodes */
    unsigned int lmlaIdx;        /* Idx of corresponding node in compressed LM 
                                    lookahead tree. can be 0 */
+   LogFloat lmlaScore;
 #ifdef COLLECT_STATS_ACTIVATION
    int eventT;          /* frame # of last (de)activation */
 #endif

@@ -587,20 +587,48 @@ void CreateKenLMLA(ModelT *lm_kenlm)
 
 LogFloat LMLookAhead_ngram_kenlm (ModelT* lm_kenlm, StateT& src, PronId minPron, PronId maxPron)
 {
-	printf("To be done\n");
-	return 0.0;
+	//printf("To be done\n");
+	//return 0.0;
+	int i;
+	LogFloat maxScore = LZERO;
+	for (i = minPron; i <= maxPron; ++i){
+		if ( lm_kenlm->m_unigrams[i] > maxScore ){
+			maxScore = lm_kenlm->m_unigrams[i];
+		}
+	}
+	
+	return maxScore;
 }
 
 LogFloat LMLookAhead_2gram_kenlm (ModelT* lm_kenlm, StateT& src, PronId minPron, PronId maxPron)
 {
-	printf("To be done\n");
-	return 0.0;
+	//printf("To be done\n");
+	//return 0.0;
+	int i;
+	LogFloat maxScore = LZERO;
+	for (i = minPron; i <= maxPron; ++i){
+		if ( lm_kenlm->m_unigrams[i] > maxScore ){
+			maxScore = lm_kenlm->m_unigrams[i];
+		}
+	}
+	
+	return maxScore;
+
 }
 
 LogFloat LMLookAhead_3gram_kenlm (ModelT* lm_kenlm, StateT& src, PronId minPron, PronId maxPron)
 {
-	printf("To be done\n");
-	return 0.0;
+	//printf("To be done\n");
+	//return 0.0;
+	int i;
+	LogFloat maxScore = LZERO;
+	for (i = minPron; i <= maxPron; ++i){
+		if ( lm_kenlm->m_unigrams[i] > maxScore ){
+			maxScore = lm_kenlm->m_unigrams[i];
+		}
+	}
+	
+	return maxScore;
 }
 
 
@@ -1050,6 +1078,9 @@ LogFloat LMLookAhead_kenlm (ModelT* lm_kenlm, StateT &src, PronId minPron, PronI
 {
 
    return lookahead_kenlm (lm_kenlm, src, minPron, maxPron);
+   //printf("%f\n",prob);
+   //return lookahead_kenlm (lm_kenlm, src, minPron, maxPron);
+   //return prob;
 
 //	LogFloat maxProb = LZERO;
 //	LogFloat prob;

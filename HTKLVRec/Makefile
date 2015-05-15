@@ -40,7 +40,7 @@ INSTALL = 	/usr/bin/install -c
 HTKLIB = $(inc)/HTKLiblv.a
 HEADER = HLVLM.h  HLVModel.h  HLVNet.h  HLVRec.h config.h
 
-all: HDecode HDecode.mod
+all: HDecode
 
 
 # binaries

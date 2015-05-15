@@ -37,7 +37,7 @@
      will be in the same node and have thus undergone the same LMla change.
 */
 
-#include<vector>
+
 
 static void UpdateLMlookahead(DecoderInst *dec, LexNode *ln)
 {
@@ -63,14 +63,30 @@ static void UpdateLMlookahead(DecoderInst *dec, LexNode *ln)
 
       if (!dec->fastlmla) {
          //lmscore = LMCacheLookaheadProb (dec, tok->lmState, lmlaIdx, FALSE);
-         lmscore = LMCacheLookaheadProb_kenlm (dec, tok->lmState_kenlm, lmlaIdx, FALSE);
+	 //printf("lmlaScore %f\n",ln->lmlaScore);
+	 if( ln->lmlaScore == 0.0 ){
+         	lmscore = LMCacheLookaheadProb_kenlm (dec, tok->lmState_kenlm, lmlaIdx, FALSE);
+		ln->lmlaScore = lmscore;
+		//dec->lookaheadCacheMap[lmlaIdx] = lmscore;
+		//printf("lmla %d lmscore %f count %d\n",lmlaIdx,lmscore,dec->lookaheadCacheMap.count(lmlaIdx));
+	 }else{
+		//printf("lmla2 %d lmscore %f count %d\n",lmlaIdx,lmscore,dec->lookaheadCacheMap.count(lmlaIdx));
+		// lmscore = dec->lookaheadCacheMap[lmlaIdx];
+		//printf("2\n");
+		lmscore = ln->lmlaScore;
+	 }
          /*      lmscore = LMLA_nocache (dec, tok->lmState, lmlaIdx); */
          
          assert (lmscore <= tok->lmscore + 0.1);   /* +0.1 because of accuracy problems (yuck!) */
       }
       else {    /* if we ever do fastLMLA, be careful as tok->lmscore might increase! */
          //lmscore = LMCacheLookaheadProb (dec, tok->lmState, lmlaIdx, (Boolean)(tok->delta < dec->fastlmlaBeam));
-         lmscore = LMCacheLookaheadProb_kenlm (dec, tok->lmState_kenlm, lmlaIdx, (Boolean)(tok->delta < dec->fastlmlaBeam));
+	 if( dec->lookaheadCacheMap.count(lmlaIdx) == 0 ){
+	         lmscore = LMCacheLookaheadProb_kenlm (dec, tok->lmState_kenlm, lmlaIdx, (Boolean)(tok->delta < dec->fastlmlaBeam));
+		 dec->lookaheadCacheMap[lmlaIdx] = lmscore;
+	 }else{
+		 lmscore = dec->lookaheadCacheMap[lmlaIdx];
+	 }
          if (lmscore > tok->lmscore)    /* if lmla goes up, leave old estimate */
             lmscore = tok->lmscore;
       }

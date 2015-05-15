@@ -37,6 +37,8 @@ Recombination and pruning is based on totlike + LMlookahead
 #ifndef _HLVREC_H_
 #define _HLVREC_H_
 
+#include<map>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -292,6 +294,9 @@ typedef struct _DecoderInst DecoderInst;  /* contains all state information abou
                                              instances (i.e. the LexNet), but this is tough... */
 
 struct _DecoderInst {
+   //lookahead prob cache
+	std::map <unsigned int,LogFloat> lookaheadCacheMap;
+
    LexNet *net;                 /* network, contains pointers to Vocab and HMMSet */
                 /* current frame?
                    info about current utterance (source, filename, length)?

@@ -624,14 +624,15 @@ static void PropIntoNode (DecoderInst *dec, TokenSet *ts, LexNode *ln, Boolean u
    /* propagate tokens from ln's exit into follLN's entry state */
    MergeTokSet (dec, ts, &inst->ts[0], 0.0, TRUE);
 
-//   if (updateLMLA) {
-//      if (ln->type != LN_WORDEND && ln->lmlaIdx != 0)
-//         UpdateLMlookahead (dec, ln);
-//   }
+   if (updateLMLA) {
+      if (ln->type != LN_WORDEND && ln->lmlaIdx != 0)
+         UpdateLMlookahead (dec, ln);
+   }
 
    /* only update inst->best if no LMLA update necessary or already done! */
    if (!(ln->type != LN_WORDEND && ln->lmlaIdx != 0) || updateLMLA) {
       best = inst->ts[0].score;
+      //printf("best of PropIntoNode %f\n",best);
       if (best > inst->best)
          inst->best = best;
    }
@@ -1332,8 +1333,8 @@ void ProcessFrame (DecoderInst *dec, Observation **obsBlock, int nObs,
             }
 #endif
 
-         //   if (inst->ts[0].score >= beamLimit)       /* don't bother if inst will be pruned anyway */
-         //      UpdateLMlookahead (dec, inst->node);
+            if (inst->ts[0].score >= beamLimit)       /* don't bother if inst will be pruned anyway */
+               UpdateLMlookahead (dec, inst->node);
 
             if (inst->ts->n > 0) {      /* UpLMLA might have killed the entire TS, esp. in latlm */
 #ifdef DEBUG_TRACE
@@ -1417,8 +1418,8 @@ void ProcessFrame (DecoderInst *dec, Observation **obsBlock, int nObs,
                }
 #endif
 
-               PropagateExternal (dec, inst, (Boolean)( !(dec->weBeamWidth < dec->beamWidth) || ((l == LAYER_SIL) || (l == LAYER_AB)) ),
-                                  (Boolean) (l == LAYER_BY) );
+               PropagateExternal (dec, inst, (Boolean)( !(dec->weBeamWidth < dec->beamWidth) || ((l == LAYER_SIL) || (l == LAYER_AB)) ), (Boolean) (l == LAYER_BY) );
+               //PropagateExternal (dec, inst, (Boolean)( !(dec->weBeamWidth < dec->beamWidth) || ((l == LAYER_SIL) || (l == LAYER_AB)) ), FALSE );
             }
 
             
@@ -1457,11 +1458,23 @@ void ProcessFrame (DecoderInst *dec, Observation **obsBlock, int nObs,
       
       /* fill histogram */
       for (l = 0; l < dec->nLayers; ++l) {
+	     // printf("l=%d\n",l);
          for (inst = dec->instsLayer[l]; inst; inst = inst->next) {
-            if (inst->best > LSMALL) { 
+	    //printf("inst->best %f\n",inst->best);
+            if (inst->best > LSMALL) {
+	       if( dec->bestScore < inst->best ){
+		       LogFloat tmp = dec->bestScore;
+		       dec->bestScore = inst->best;
+		       inst->best = tmp;
+	       }
+
                bin = (dec->bestScore - inst->best) / binWidth;
+//	       if(bin<0){
+//		       printf("bin %d dec->bestScore %f inst->best %f binWidth %f\n",bin,dec->bestScore,inst->best,binWidth);
+//	       }
                assert (bin >= 0);       /* best is either LZERO or <= dec->bestScore */
                if (bin < MMP_NBINS) {
+		  //printf("bin %d\n",bin);
                   ++hist[bin];
                   ++nhist;
                }

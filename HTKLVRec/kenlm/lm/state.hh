@@ -18,7 +18,10 @@ class State {
       if (length != other.length) return false;
       return !memcmp(words, other.words, length * sizeof(WordIndex));
     }
-
+    bool operator!=(const State &other) const {
+      if (length != other.length) return true;
+      return memcmp(words, other.words, length * sizeof(WordIndex));
+    }
     // Three way comparison function.  
     int Compare(const State &other) const {
       if (length != other.length) return length < other.length ? -1 : 1;
