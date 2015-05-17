@@ -107,6 +107,7 @@ template <class Search, class VocabularyT> class GenericModel : public base::Mod
     // add by yjsi
   public:
     float  *m_unigrams;
+    float  *m_backoffs;
     PronId *m_pron2wordIndex;
 
   private:

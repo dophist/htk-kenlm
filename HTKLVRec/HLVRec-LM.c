@@ -81,12 +81,18 @@ static void UpdateLMlookahead(DecoderInst *dec, LexNode *ln)
       }
       else {    /* if we ever do fastLMLA, be careful as tok->lmscore might increase! */
          //lmscore = LMCacheLookaheadProb (dec, tok->lmState, lmlaIdx, (Boolean)(tok->delta < dec->fastlmlaBeam));
-	 if( dec->lookaheadCacheMap.count(lmlaIdx) == 0 ){
-	         lmscore = LMCacheLookaheadProb_kenlm (dec, tok->lmState_kenlm, lmlaIdx, (Boolean)(tok->delta < dec->fastlmlaBeam));
-		 dec->lookaheadCacheMap[lmlaIdx] = lmscore;
+	if( ln->lmlaScore == 0.0 ){
+         	lmscore = LMCacheLookaheadProb_kenlm (dec, tok->lmState_kenlm, lmlaIdx, FALSE);
+		ln->lmlaScore = lmscore;
+		//dec->lookaheadCacheMap[lmlaIdx] = lmscore;
+		//printf("lmla %d lmscore %f count %d\n",lmlaIdx,lmscore,dec->lookaheadCacheMap.count(lmlaIdx));
 	 }else{
-		 lmscore = dec->lookaheadCacheMap[lmlaIdx];
+		//printf("lmla2 %d lmscore %f count %d\n",lmlaIdx,lmscore,dec->lookaheadCacheMap.count(lmlaIdx));
+		// lmscore = dec->lookaheadCacheMap[lmlaIdx];
+		//printf("2\n");
+		lmscore = ln->lmlaScore;
 	 }
+
          if (lmscore > tok->lmscore)    /* if lmla goes up, leave old estimate */
             lmscore = tok->lmscore;
       }

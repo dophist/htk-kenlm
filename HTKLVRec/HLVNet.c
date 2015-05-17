@@ -1066,6 +1066,7 @@ static void InitLMlaTree(LexNet *net, TLexNet *tnet)
    laTree = (LMlaTree *) New (net->heap, sizeof(LMlaTree));
    net->laTree = laTree;
    laTree->nNodes = tnet->lmlaCount + 1;        /* extra entry for lmlaIdx=0 */
+   printf("laTree->nNodes is %d\n",laTree->nNodes);
 
    laTree->node = (LMlaNode *) New (net->heap, laTree->nNodes * sizeof (LMlaNode));
 
@@ -1146,6 +1147,10 @@ LexNet *ConvertTLex2Lex (MemHeap *heap, ModelT *lm_kenlm, TLexNet *tnet)
    lm_kenlm->m_unigrams = (LogFloat*) New( heap, (net->voc->nprons + 1) * sizeof(LogFloat) );
    lm_kenlm->m_unigrams[0] = -100;
 
+   lm_kenlm->m_backoffs = (LogFloat*) New( heap, (net->voc->nprons + 1) * sizeof(LogFloat) );
+   lm_kenlm->m_backoffs[0] = -100;
+
+
    lm_kenlm->m_pron2wordIndex = (PronId *) New (heap, (net->voc->nprons + 1) * sizeof (PronId));
    lm_kenlm->m_pron2wordIndex[0] = -1;
 
@@ -1202,6 +1207,7 @@ LexNet *ConvertTLex2Lex (MemHeap *heap, ModelT *lm_kenlm, TLexNet *tnet)
 	 net->pron2wordIndex[tln->loWE]         =  vocab_kenlm->Index(tln->pron->word->wordName->name);
 	 lm_kenlm->m_pron2wordIndex[tln->loWE]  =  net->pron2wordIndex[tln->loWE];
 	 lm_kenlm->m_unigrams[tln->loWE]        =  IN10*lm_kenlm->Score(state, net->pron2wordIndex[tln->loWE], out_state);
+	 lm_kenlm->m_backoffs[tln->loWE]        =  IN10*out_state.backoff[0];
 	 //printf("%s %f\n",tln->pron->word->wordName->name,lm_kenlm->m_unigrams[tln->loWE]);
          break;
       default:
