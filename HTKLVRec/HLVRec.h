@@ -121,11 +121,18 @@ struct _AltWordendHyp {         /* stores info about N-best word(end) for lattic
 
 /* macros to compare whether two tokens are quivalent accoring to the LM. */
 
-#define TOK_LMSTATE_LT(t1,t2)   (((t1)->lmState <  (t2)->lmState) ||   \
-                                 (((t1)->lmState == (t2)->lmState) &&  \
+//#define TOK_LMSTATE_LT(t1,t2)   (((t1)->lmState <  (t2)->lmState) ||   \
+//                                 (((t1)->lmState == (t2)->lmState) &&  \
+//                                  ((t1)->we_tag < (t2)->we_tag)))
+//#define TOK_LMSTATE_EQ(t1,t2)   (((t1)->lmState == (t2)->lmState) &&   \
+//                                 ((t1)->we_tag == (t2)->we_tag))
+
+#define TOK_LMSTATE_LT(t1,t2)   (((t1)->lmState_kenlm.words[0] <  (t2)->lmState_kenlm.words[0]) ||   \
+                                 (((t1)->lmState_kenlm.words[0] == (t2)->lmState_kenlm.words[0]) &&  \
                                   ((t1)->we_tag < (t2)->we_tag)))
-#define TOK_LMSTATE_EQ(t1,t2)   (((t1)->lmState == (t2)->lmState) &&   \
+#define TOK_LMSTATE_EQ(t1,t2)   (((t1)->lmState_kenlm.words[0] == (t2)->lmState_kenlm.words[0]) &&   \
                                  ((t1)->we_tag == (t2)->we_tag))
+
 
 #if 0   /* not used -- #### out of date! */
   #define TOK_LMSTATE_LE(t1,t2)   ((t1)->lmState <= (t2)->lmState)
